@@ -1,3 +1,3 @@
 # infra-app-bootcamp
 
-Infraestructure for a test app.
+Infrastructure for a test app.
