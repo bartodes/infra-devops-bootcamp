@@ -2,7 +2,7 @@ module "vpc" {
     source = "terraform-aws-modules/vpc/aws"
     version = "3.19.0"
 
-    name = "my-vpc" #Switch for variable input
+    name = var.vpc_name
     cidr = "10.0.0.0/16"
 
     azs             = ["us-east-1a", "us-east-1b"]
@@ -17,7 +17,8 @@ module "vpc" {
     create_igw = true
 
     tags = {
-        Terraform = "true"
-        Environment = "dev" #Switch for variable input
+        Terraform   = "true"
+        Name        = var.vpc_name
+        Environment = var.environment
     }
 }
