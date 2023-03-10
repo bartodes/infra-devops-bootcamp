@@ -1,0 +1,1 @@
+#Mostrar el output de la VPC de los componentes de cada environment, cuando los creemos en terragrunt
