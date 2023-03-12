@@ -5,14 +5,16 @@ module "ec2_instance" {
   name = var.ec2_name
 
   ami                    = data.aws_ami.ubuntu.id
-  instance_type          = "t2.micro"
+  instance_type          = var.instance_type
   key_name               = var.key_name
-  #monitoring             = true
-  #vpc_security_group_ids = 
-  #subnet_id              = module.vpc.private_subnets[1]
+  
+  #monitoring            = true
+  #vpc_security_group_ids = var.vpc_sg
+  subnet_id              = var.private_subnets
 
   tags = {
     Terraform   = "true"
+    Name        = var.ec2_name
     Environment = var.environment
   }
 }
