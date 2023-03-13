@@ -25,7 +25,7 @@ variable "private_subnets_control_plane" {
     type = list(string)
 }
 
-variable "node_group_instance_type" {
-    description = "The default node group instance"
-    type = string
+variable "node_group_instances_type" {
+    description = "The node group instances"
+    type = list(string)
 }
