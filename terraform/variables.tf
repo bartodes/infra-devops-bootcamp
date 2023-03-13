@@ -12,7 +12,7 @@ variable "root_ec2_name" {
     type        = string 
 }
 
-variable "root_ec2_intsance_type" {
+variable "root_instance_type" {
     description = "The instance type of the ec2 server."
     type        = string
 }
