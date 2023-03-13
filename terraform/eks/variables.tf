@@ -1,18 +1,3 @@
-variable "aws_access_key" {
-    description = "The AWS user access key"
-    type = string
-}
-
-variable "aws_secret_key" {
-    description = "The AWS user secret key"
-    type = string
-}
-
-variable "aws_region" {
-    description = "The AWS region"
-    type = string
-}
-
 variable "environment" {
     description = "The environment of the file"
     type = string
