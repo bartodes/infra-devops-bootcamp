@@ -13,7 +13,7 @@ module "ec2_instance_root" {
 
     environment     = var.root_environment            
     ec2_name        = var.root_ec2_name                          
-    instance_type   = var.root_ec2_intsance_type
+    instance_type   = var.root_instance_type
     key_name        = var.root_key_name
 
     ec2_user_data   = <<EOF
