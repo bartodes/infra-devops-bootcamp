@@ -25,3 +25,18 @@ variable "root_key_name" {
 variable "root_sg_name" {
     description = "The name of the security group."
 }
+
+variable "root_cluster_name" {
+    description = "The name of the cluster"
+    type = string
+}
+
+variable "root_cluster_version" {
+    description = "The version of the cluster"
+    type = string
+}
+
+variable "root_node_group_instances_type" {
+    description = "The node group instances"
+    type = list(string)
+}
