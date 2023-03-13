@@ -23,7 +23,11 @@ variable "private_subnets" {
     type        = string
 }
 
-# variable "vpc_sg" {
-#     description = "The ID of a security group."
-#     type        = string #Capaz es list(string) 
-# }
+variable "ec2_sg" {
+    description = "The ID of a security group."
+    type        = list(string)
+}
+
+variable "ec2_user_data" {
+    description = "The user data to provide when launching the instance."
+}
