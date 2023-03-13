@@ -13,7 +13,7 @@ module "ec2_instance_root" {
 
     environment     = var.root_environment            
     ec2_name        = var.root_ec2_name                          
-    instance_type   = var.root_instance_type
+    instance_type   = var.root_ec2_instance_type
     key_name        = var.root_key_name
 
     ec2_user_data   = <<EOF
@@ -25,7 +25,7 @@ module "ec2_instance_root" {
 module "sg_root" {
     source = "./sg"
 
-    vpc_id      = module.vpc_root.vpc_id
+    vpc_id = module.vpc_root.vpc_id
 
     environment = var.root_environment
     sg_name     = var.root_sg_name
@@ -34,14 +34,12 @@ module "sg_root" {
 module "eks_root" {
     source = "./eks"
 
-    vpc_id = module.vpc_root_id
-  
-    private_subnets_cluster = [module.vpc_root.private_subnets_id]
-    private_subnets_control_plane = [module.vpc_root.private_subnets_id]
+    vpc_id                        = module.vpc_root.vpc_id
+    private_subnets_cluster       = module.vpc_root.private_subnets_id
+    private_subnets_control_plane = module.vpc_root.private_subnets_id
 
-    node_group_instances_type = [var.root_node_group_instances_type]
-
-    environment = var.root_environment
-    cluster_name = var.root_cluster_name
-    cluster_version = var.root_cluster_version
+    node_group_instances_type = var.root_node_group_instances_type
+    environment               = var.root_environment
+    cluster_name              = var.root_cluster_name
+    cluster_version           = var.root_cluster_version
 }
