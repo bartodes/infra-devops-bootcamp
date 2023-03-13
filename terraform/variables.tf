@@ -18,6 +18,10 @@ variable "root_ec2_intsance_type" {
 }
 
 variable "root_key_name" {
-    description = "The name of a key pair."
+    description = "The name of the key pair."
     type        = string
+}
+
+variable "root_sg_name" {
+    description = "The name of the security group."
 }
