@@ -30,3 +30,18 @@ module "sg_root" {
     environment = var.root_environment
     sg_name     = var.root_sg_name
 }
+
+module "eks_root" {
+    source = "./eks"
+
+    vpc_id = module.vpc_root_id
+  
+    private_subnets_cluster = [module.vpc_root.private_subnets_id]
+    private_subnets_control_plane = [module.vpc_root.private_subnets_id]
+
+    node_group_instances_type = [var.root_node_group_instances_type]
+
+    environment = var.root_environment
+    cluster_name = var.root_cluster_name
+    cluster_version = var.root_cluster_version
+}
