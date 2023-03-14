@@ -21,8 +21,8 @@ module "eks" {
   }
 
   vpc_id                   = var.vpc_id
-  subnet_ids               = [var.private_subnets_cluster]
-  control_plane_subnet_ids = [var.private_subnets_control_plane]
+  subnet_ids               = var.private_subnets_cluster
+  control_plane_subnet_ids = var.private_subnets_control_plane
 
   eks_managed_node_groups = {
     green = {
@@ -30,7 +30,7 @@ module "eks" {
       max_size     = 3
       desired_size = 1
 
-      instance_types = [var.node_group_instances_type]
+      instance_types = ["t2.micro"]
       capacity_type  = "SPOT"
     }
   }
