@@ -17,3 +17,7 @@ inputs = {
     root_cluster_version           = "1.24"
     root_node_group_instances_type = ["t2.micro"]
 }
+
+// include {
+//     path = find_in_parent_folders()
+// }
