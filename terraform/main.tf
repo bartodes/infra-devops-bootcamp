@@ -1,5 +1,5 @@
 module "vpc_root" {
-    source = "./network"
+    source = "./vpc"
 
     environment = var.root_environment
     vpc_name = var.root_vpc_name
@@ -23,7 +23,7 @@ module "ec2_instance_root" {
 }
 
 module "sg_root" {
-    source = "./sg"
+    source = "./security-group"
 
     vpc_id = module.vpc_root.vpc_id
 
