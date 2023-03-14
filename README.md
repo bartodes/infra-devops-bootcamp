@@ -9,5 +9,5 @@ Infrastructure for a [test app](https://github.com/edgaregonzalez/app-devops-boo
 ```
 cd terragrunt/dev
 terragrunt init
-terragrunt applya
+terragrunt apply
 ```
