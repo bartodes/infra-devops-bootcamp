@@ -1,0 +1,11 @@
+stages {
+    stage('Clone'){
+        steps{}
+    }
+    stage('Build'){
+        steps{}
+    }
+    stage('Test'){
+        steps{}
+    }
+}
