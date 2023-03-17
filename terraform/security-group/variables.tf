@@ -29,6 +29,12 @@ variable "web_ingress" {
             protocol    = "tcp"
             cidr_blocks = ["0.0.0.0/0"]
         }
+        "8080" = {
+            description = "Allow inbound traffic for Jenkins."
+            port        = 8080
+            protocol    = "tcp"
+            cidr_blocks = ["0.0.0.0/0"]
+        }
     }
 }
 
