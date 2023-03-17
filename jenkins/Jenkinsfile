@@ -4,6 +4,9 @@ pipeline {
         stage('Clone') {
             steps {
                 echo 'Cloning...'
+                sh '''
+                git clone https://github.com/edgaregonzalez/app-devops-bootcamp
+                '''
             }
         }
         stage('Build') {
