@@ -1,12 +1,12 @@
 module "vpc_root" {
-    source = "./vpc"
+    source = "./modules/vpc"
 
     environment = var.root_environment
     vpc_name = var.root_vpc_name
 }
 
 module "ec2_instance_root" {
-    source = "./ec2"
+    source = "./modules/ec2"
 
     private_subnets = module.vpc_root.private_subnets_id[0]      
     ec2_sg          = [module.sg_root.sg_id]
@@ -31,7 +31,7 @@ module "ec2_instance_root" {
 }
 
 module "sg_root" {
-    source = "./security-group"
+    source = "./modules/security-group"
 
     vpc_id = module.vpc_root.vpc_id
 
@@ -40,7 +40,7 @@ module "sg_root" {
 }
 
 module "eks_root" {
-    source = "./eks"
+    source = "./modules/eks"
 
     vpc_id                        = module.vpc_root.vpc_id
     private_subnets_cluster       = module.vpc_root.private_subnets_id
