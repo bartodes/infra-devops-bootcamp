@@ -28,6 +28,7 @@ module "ec2_instance_root" {
     sudo systemctl enable jenkins
     sudo systemctl start jenkins
     EOF
+    #Posibilidad de hacerlo con docker
 }
 
 module "sg_root" {
