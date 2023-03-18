@@ -16,19 +16,7 @@ module "ec2_instance_root" {
     instance_type   = var.root_ec2_instance_type
     key_name        = var.root_key_name
 
-    ec2_user_data   = <<EOF
-    #!/bin/bash
-    curl -fsSL https://pkg.jenkins.io/debian-stable/jenkins.io.key | sudo tee \
-    /usr/share/keyrings/jenkins-keyring.asc > /dev/null
-    echo deb [signed-by=/usr/share/keyrings/jenkins-keyring.asc] \
-    https://pkg.jenkins.io/debian-stable binary/ | sudo tee \
-    /etc/apt/sources.list.d/jenkins.list > /dev/null
-    sudo apt-get update
-    sudo apt-get install -y jenkins openjdk-11-jre
-    sudo systemctl enable jenkins
-    sudo systemctl start jenkins
-    EOF
-    #Posibilidad de hacerlo con docker
+    ec2_user_data   = "${file("user_data/jenkins.sh")}"
 }
 
 module "sg_root" {
