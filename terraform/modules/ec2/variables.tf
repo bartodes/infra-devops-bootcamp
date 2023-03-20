@@ -18,7 +18,7 @@ variable "instance_type" {
     type        = string
 }
 
-variable "private_subnets" {
+variable "public_subnets" {
     description = "The id of the private subnets."
     type        = string
 }
