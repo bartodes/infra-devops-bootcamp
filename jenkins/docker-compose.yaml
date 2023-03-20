@@ -1,7 +1,7 @@
 version: "3.8"
 services:
   docker:
-    image: bartodes/myjenkins-blueocean:2.387.1-1
+    image: docker:dind
     container_name: jenkins_docker
     restart: always
     privileged: true
@@ -9,7 +9,10 @@ services:
       jenkins:
         aliases:
           - docker
+    environment:
+      DOCKER_TLS_CERTDIR: /certs
     volumes:
+      - jenkins-docker-certs:/certs/client
       - jenkins-data:/var/jenkins_home
     ports:
       - "127.0.0.1:2376:2376"
@@ -22,7 +25,10 @@ services:
       - jenkins
     environment:
       DOCKER_HOST: tcp://docker:2376
+      DOCKER_CERT_PATH: /certs/client
+      DOCKER_TLS_VERIFY: 1
     volumes:
+      - jenkins-docker-certs:/certs/client:ro
       - jenkins-data:/var/jenkins_home
     ports:
       - "127.0.0.1:8080:8080"
