@@ -18,12 +18,12 @@ variable "vpc_id" {
     type = string
 }
 
-variable "private_subnets_cluster" {
+variable "public_subnets_cluster" {
     description = "The private subnets id for the cluster"
     type = list(string)
 }
 
-variable "private_subnets_control_plane" {
+variable "public_subnets_control_plane" {
     description = "The private subnets id for the control plane"
     type = list(string)
 }
