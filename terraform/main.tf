@@ -32,8 +32,8 @@ module "eks_root" {
     source = "./modules/eks"
 
     vpc_id                        = module.vpc_root.vpc_id
-    private_subnets_cluster       = module.vpc_root.public_subnets_id
-    private_subnets_control_plane = module.vpc_root.public_subnets_id
+    public_subnets_cluster       = module.vpc_root.public_subnets_id
+    public_subnets_control_plane = module.vpc_root.public_subnets_id
 
     node_group_instances_type = var.root_node_group_instances_type
     environment               = var.root_environment
