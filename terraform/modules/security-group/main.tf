@@ -11,7 +11,7 @@ resource "aws_security_group" "main_sg" {
             to_port     = ingress.value.port
             protocol    = ingress.value.protocol
             cidr_blocks = ingress.value.cidr_blocks
-            }
+        }
     }
 
     egress {
