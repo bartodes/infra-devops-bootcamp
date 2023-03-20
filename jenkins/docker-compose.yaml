@@ -1,13 +1,36 @@
-version: '3.8'
+version: "3.8"
 services:
+  docker:
+    image: bartodes/myjenkins-blueocean:2.387.1-1
+    container_name: jenkins_docker
+    restart: always
+    privileged: true
+    networks:
+      jenkins:
+        aliases:
+          - docker
+    volumes:
+      - jenkins-data:/var/jenkins_home
+    ports:
+      - "127.0.0.1:2376:2376"
   jenkins:
     image: bartodes/myjenkins-blueocean:2.387.1-1
-    privileged: true
-    user: root
-    ports:
-      - 8080:8080
-      - 50000:50000
-    container_name: jenkins
+    container_name: jenkins_blueocean
+    depends_on:
+      - docker
+    networks:
+      - jenkins
+    environment:
+      DOCKER_HOST: tcp://docker:2376
     volumes:
-      - /home/ubuntu/jenkins_compose/jenkins_configuration:/var/jenkins_home
-      - /var/run/docker.sock:/var/run/docker.sock
+      - jenkins-data:/var/jenkins_home
+    ports:
+      - "127.0.0.1:8080:8080"
+      - "127.0.0.1:50000:50000"
+
+volumes:
+  jenkins-docker-certs:
+  jenkins-data:
+
+networks:
+  jenkins:
