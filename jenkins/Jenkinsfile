@@ -5,18 +5,25 @@ pipeline {
             steps {
                 echo 'Cloning...'
                 sh '''
-                git clone https://github.com/edgaregonzalez/app-devops-bootcamp
+                git clone https://github.com/bartodes/app-devops-bootcamp
                 '''
             }
         }
         stage('Build') {
             steps {
                 echo 'Building...'
+                sh '''
+                docker build -t app-devops-bootcamp:v1.0.0
+                docker run -d -p 3000:3000 --name app_v1 app-devops-bootcamp:v1.0.0
+                '''
             }
         }
         stage('Test') {
             steps {
                 echo 'Testing...'
+                sh'''
+                docker exec app_v1 npm run test
+                '''
             }
         }
     }
