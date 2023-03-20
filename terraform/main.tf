@@ -8,7 +8,7 @@ module "vpc_root" {
 module "ec2_instance_root" {
     source = "./modules/ec2"
 
-    private_subnets = module.vpc_root.private_subnets_id[0]      
+    public_subnets = module.vpc_root.public_subnets_id[0]      
     ec2_sg          = [module.sg_root.sg_id]
 
     environment     = var.root_environment            
@@ -32,8 +32,8 @@ module "eks_root" {
     source = "./modules/eks"
 
     vpc_id                        = module.vpc_root.vpc_id
-    private_subnets_cluster       = module.vpc_root.private_subnets_id
-    private_subnets_control_plane = module.vpc_root.private_subnets_id
+    private_subnets_cluster       = module.vpc_root.public_subnets_id
+    private_subnets_control_plane = module.vpc_root.public_subnets_id
 
     node_group_instances_type = var.root_node_group_instances_type
     environment               = var.root_environment
