@@ -4,29 +4,37 @@ pipeline {
         stage('Clone') {
             steps {
                 echo 'Cloning...'
-                sh '''
+                sh """
+                rm -rf app-devops-bootcamp
                 git clone https://github.com/bartodes/app-devops-bootcamp
-                '''
+                """
             }
         }
         stage('Build') {
             steps {
                 echo 'Building...'
-                sh '''
-                cd app-devops-bootcamp/api-store
-                docker build -t app-devops-bootcamp:v1.0.0 
+
+                sh """
+                docker rmi -f app-devops-bootcamp:v1.0.0
+                docker build -t app-devops-bootcamp:v1.0.0 ./app-devops-bootcamp/api-store
                 docker run -d -p 3000:3000 --name app_v1 app-devops-bootcamp:v1.0.0
-                '''
+                """
                 //docker push
             }
         }
         stage('Test') {
             steps {
                 echo 'Testing...'
-                sh'''
+                sh"""
                 docker exec app_v1 npm run test
-                '''
+                """
             }
         }
+        // stage('Delete Working Directory'){
+        //     steps{
+        //         echo 'Deleting directory...'
+        //         deleteDir()
+        //     } 
+        // }
     }
 }
