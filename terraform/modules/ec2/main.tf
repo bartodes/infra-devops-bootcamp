@@ -10,7 +10,7 @@ module "ec2_instance" {
   
   #monitoring            = true Descomemetar cuando se deje de usar localstack como provider
   vpc_security_group_ids = var.ec2_sg
-  subnet_id              = var.private_subnets
+  subnet_id              = var.public_subnets
   user_data              = var.ec2_user_data
 
   tags = {
