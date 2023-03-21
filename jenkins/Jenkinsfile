@@ -1,40 +1,61 @@
 pipeline {
     agent any
+    environment {
+        DIR_NAME = 'app-devops-bootcamp/api-store'
+        IMG_NAME = 'estebanmengoni/app-store-bootcamp'
+        CONTAINER_NAME = 'app_store'
+        REPO_URL = 'https://github.com/bartodes/app-devops-bootcamp'
+        REPO_DIR = 'app-devops-bootcamp'
+    }
+    parameters {
+        string(name: 'IMG_VERSION', description: 'Docker version to build')
+    }
     stages {
         stage('Clone') {
             steps {
                 echo 'Cloning...'
                 sh """
-                rm -rf app-devops-bootcamp
-                git clone https://github.com/bartodes/app-devops-bootcamp
+                rm -rf ${REPO_DIR}
+                git clone ${REPO_URL}
                 """
             }
         }
         stage('Build') {
             steps {
-                echo 'Building...'
-
+                echo "Building... ID: ${BUILD_ID} URL: ${BUILD_URL}"
                 sh """
-                docker build -t app-devops-bootcamp:v1.0.0 ./app-devops-bootcamp/api-store
-                docker run -d -p 3000:3000 --name app_v1 app-devops-bootcamp:v1.0.0
+                docker build -t ${IMG_NAME}:${params.IMG_VERSION} ./${DIR_NAME}
+                docker container rm -f ${CONTAINER_NAME}
+                docker run -d -p 3000:3000 --name ${CONTAINER_NAME} ${IMG_NAME}:${params.IMG_VERSION}
                 """
-                //docker push
+                echo "Pushing Docker Image..."
+                withCredentials([
+                    usernamePassword(credentialsId: 'docker_creds', usernameVariable: 'DOCKER_USR', passwordVariable: 'DOCKER_PSSWD')
+                ]){
+                    sh """
+                    docker login -u ${DOCKER_USR} -p ${DOCKER_PSSWD}
+                    docker push ${IMG_NAME}:${params.IMG_VERSION}
+                    """
+                }
             }
         }
         stage('Test') {
             steps {
                 echo 'Testing...'
                 sh"""
-                docker exec app_v1 npm run test
-                docker image rm -f app-devops-bootcamp:v1.0.0
+                docker exec ${CONTAINER_NAME} npm run test
                 """
             }
         }
-        // stage('Delete Working Directory'){
-        //     steps{
-        //         echo 'Deleting directory...'
-        //         deleteDir()
-        //     } 
-        // }
+        stage('Purge'){
+            steps{
+                echo 'Purging docker files...'
+                sh"""
+                rm -rf ${REPO_DIR}
+                docker rmi -f ${IMG_NAME}:${params.IMG_VERSION}
+                docker container rm -f ${CONTAINER_NAME}
+                """
+            } 
+        }
     }
 }
