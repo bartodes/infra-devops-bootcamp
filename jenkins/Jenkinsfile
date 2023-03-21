@@ -28,6 +28,18 @@ pipeline {
                 docker container rm -f ${CONTAINER_NAME}
                 docker run -d -p 3000:3000 --name ${CONTAINER_NAME} ${IMG_NAME}:${params.IMG_VERSION}
                 """
+            }
+        }
+        stage('Test') {
+            steps {
+                echo 'Testing...'
+                sh"""
+                docker exec ${CONTAINER_NAME} npm run test
+                """
+            }
+        }
+        stage('Push') {
+            steps {
                 echo "Pushing Docker Image..."
                 withCredentials([
                     usernamePassword(credentialsId: 'docker_creds', usernameVariable: 'DOCKER_USR', passwordVariable: 'DOCKER_PSSWD')
@@ -39,17 +51,9 @@ pipeline {
                 }
             }
         }
-        stage('Test') {
-            steps {
-                echo 'Testing...'
-                sh"""
-                docker exec ${CONTAINER_NAME} npm run test
-                """
-            }
-        }
-        stage('Purge'){
+        stage('Delete'){
             steps{
-                echo 'Purging docker files...'
+                echo 'Deleting working files...'
                 sh"""
                 rm -rf ${REPO_DIR}
                 docker rmi -f ${IMG_NAME}:${params.IMG_VERSION}
