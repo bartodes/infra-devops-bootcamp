@@ -15,12 +15,10 @@ services:
       - jenkins-docker-certs:/certs/client
       - jenkins-data:/var/jenkins_home
     ports:
-      - "127.0.0.1:2376:2376"
+      - "2376:2376"
   jenkins:
     image: bartodes/myjenkins-blueocean:2.387.1-1
     container_name: jenkins_blueocean
-    depends_on:
-      - docker
     networks:
       - jenkins
     environment:
@@ -31,8 +29,8 @@ services:
       - jenkins-docker-certs:/certs/client:ro
       - jenkins-data:/var/jenkins_home
     ports:
-      - "127.0.0.1:8080:8080"
-      #- "127.0.0.1:50000:50000"
+      - "8080:8080"
+      - "50000:50000"
 
 volumes:
   jenkins-docker-certs:
