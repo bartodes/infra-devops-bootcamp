@@ -1,14 +1,14 @@
 pipeline {
     agent any
+    parameters {
+        string(name: 'IMG_VERSION', description: 'Docker version to build')
+    }
     environment {
         DIR_NAME = 'app-devops-bootcamp/api-store'
         IMG_NAME = 'bartodes/app-store-bootcamp'
         CONTAINER_NAME = 'app_store'
         REPO_URL = 'https://github.com/bartodes/app-devops-bootcamp'
         REPO_DIR = 'app-devops-bootcamp'
-    }
-    parameters {
-        string(name: 'IMG_VERSION', description: 'Docker version to build')
     }
     stages {
         stage('Clone') {
@@ -24,9 +24,9 @@ pipeline {
             steps {
                 echo "Building... ID: ${BUILD_ID} URL: ${BUILD_URL}"
                 sh """
-                docker build -t ${IMG_NAME}:${parms.IMG_VERSION} ./${DIR_NAME}
+                docker build -t ${IMG_NAME}:${params.IMG_VERSION} ./${DIR_NAME}
                 docker container rm -f ${CONTAINER_NAME}
-                docker run -d -p 3000:3000 --name ${CONTAINER_NAME} ${IMG_NAME}:${parms.IMG_VERSION}
+                docker run -d -p 3000:3000 --name ${CONTAINER_NAME} ${IMG_NAME}:${params.IMG_VERSION}
                 """
                 echo "Pushing Docker Image..."
                 withCredentials([
@@ -34,7 +34,7 @@ pipeline {
                 ]){
                     sh """
                     docker login -u ${DOCKER_USR} -p ${DOCKER_PSSWD}
-                    docker push ${IMG_NAME}:${parms.IMG_VERSION}
+                    docker push ${IMG_NAME}:${params.IMG_VERSION}
                     """
                 }
             }
@@ -52,7 +52,7 @@ pipeline {
                 echo 'Purging docker files...'
                 sh"""
                 rm -rf ${REPO_DIR}
-                docker rmi -f ${IMG_NAME}:${parms.IMG_VERSION}
+                docker rmi -f ${IMG_NAME}:${params.IMG_VERSION}
                 docker container rm -f ${CONTAINER_NAME}
                 """
             } 
