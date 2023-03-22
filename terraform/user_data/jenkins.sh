@@ -13,4 +13,4 @@ rm -rf infra-devops-bootcamp
 git clone https://github.com/bartodes/infra-devops-bootcamp.git
 cd infra-devops-bootcamp/jenkins
 sudo docker compose up --detach
-sudo docker exec jenkins_blueocean cat /var/jenkins_home/secrets/initialAdminPassword > ~/jenkinsInitialCredentials.txt
+sudo docker exec jenkins_blueocean cat /var/jenkins_home/secrets/initialAdminPassword > /home/ubuntu/jenkinsInitialCredentials.txt
