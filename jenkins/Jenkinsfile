@@ -1,11 +1,13 @@
 pipeline {
     agent any
     parameters {
-        string(name: 'IMG_VERSION', description: 'Docker version to build')
+        string(name: 'REGISTRY', description: 'The name of the docker registry to push the image. (<registry>/name:version)')
+        string(name: 'IMG_VERSION', description: 'The version of the docker image to build. (registry/name:<version>)')
+        string(name: 'CREDS_ID', description: 'The ID of the credential. (in jenkins credential administrator)')
     }
     environment {
         DIR_NAME = 'app-devops-bootcamp/api-store'
-        IMG_NAME = 'estebanmengoni/app-store-bootcamp'
+        IMG_NAME = 'app-store-bootcamp'
         CONTAINER_NAME = 'app_store'
         REPO_URL = 'https://github.com/bartodes/app-devops-bootcamp'
         REPO_DIR = 'app-devops-bootcamp'
@@ -15,7 +17,6 @@ pipeline {
             steps {
                 echo 'Cloning...'
                 sh """
-                rm -rf ${REPO_DIR}
                 git clone ${REPO_URL}
                 """
             }
@@ -24,9 +25,9 @@ pipeline {
             steps {
                 echo "Building... ID: ${BUILD_ID} URL: ${BUILD_URL}"
                 sh """
-                docker build -t ${IMG_NAME}:${params.IMG_VERSION} ./${DIR_NAME}
+                docker build -t ${params.REGISTRY}/${IMG_NAME}:${params.IMG_VERSION} ./${DIR_NAME}
                 docker container rm -f ${CONTAINER_NAME}
-                docker run -d -p 3000:3000 --name ${CONTAINER_NAME} ${IMG_NAME}:${params.IMG_VERSION}
+                docker run -d -p 3000:3000 --name ${CONTAINER_NAME} ${params.REGISTRY}/${IMG_NAME}:${params.IMG_VERSION}
                 """
             }
         }
@@ -42,24 +43,24 @@ pipeline {
             steps {
                 echo "Pushing Docker Image..."
                 withCredentials([
-                    usernamePassword(credentialsId: 'docker_creds', usernameVariable: 'DOCKER_USR', passwordVariable: 'DOCKER_PSSWD')
+                    usernamePassword(credentialsId: "${params.CREDS_ID}", usernameVariable: 'DOCKER_USR', passwordVariable: 'DOCKER_PSSWD')
                 ]){
                     sh """
                     docker login -u ${DOCKER_USR} -p ${DOCKER_PSSWD}
-                    docker push ${IMG_NAME}:${params.IMG_VERSION}
+                    docker push ${params.REGISTRY}/${IMG_NAME}:${params.IMG_VERSION}
                     """
                 }
             }
         }
-        stage('Delete'){
-            steps{
-                echo 'Deleting working files...'
-                sh"""
-                rm -rf ${REPO_DIR}
-                docker rmi -f ${IMG_NAME}:${params.IMG_VERSION}
-                docker container rm -f ${CONTAINER_NAME}
-                """
-            } 
+    }
+    post{
+        always{
+            echo 'Deleting working files...'
+            sh"""
+            rm -rf ${REPO_DIR}
+            docker rmi -f ${IMG_NAME}:${params.IMG_VERSION}
+            docker container rm -f ${CONTAINER_NAME}
+            """
         }
     }
 }
