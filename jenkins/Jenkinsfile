@@ -11,7 +11,7 @@ pipeline {
         CONTAINER_NAME = 'app_store'
         REPO_URL = 'https://github.com/bartodes/app-devops-bootcamp'
         REPO_DIR = 'app-devops-bootcamp'
-        NODE_NAME = 'docker-test' 
+        NODE_NAME = 'nodejs:18.15.0' 
     }
     stages {
         stage('Clone') {
