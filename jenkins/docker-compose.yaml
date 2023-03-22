@@ -19,6 +19,7 @@ services:
   jenkins:
     image: bartodes/myjenkins-blueocean:2.387.1-1
     container_name: jenkins_blueocean
+    restart: always
     networks:
       - jenkins
     environment:
