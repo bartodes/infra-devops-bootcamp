@@ -21,6 +21,18 @@ pipeline {
                 """
             }
         }
+        stage('Test') {
+            steps {
+                nodejs(nodeJSInstallationName: 'docker-test'){
+                    echo 'Testing...'
+                    sh """
+                    cd ${DIR_NAME}
+                    npm install
+                    npm run test
+                    """
+                }
+            }
+        }
         stage('Build') {
             steps {
                 echo "Building... ID: ${BUILD_ID} URL: ${BUILD_URL}"
@@ -28,14 +40,6 @@ pipeline {
                 docker build -t ${params.REGISTRY}/${IMG_NAME}:${params.IMG_VERSION} ./${DIR_NAME}
                 docker container rm -f ${CONTAINER_NAME}
                 docker run -d -p 3000:3000 --name ${CONTAINER_NAME} ${params.REGISTRY}/${IMG_NAME}:${params.IMG_VERSION}
-                """
-            }
-        }
-        stage('Test') {
-            steps {
-                echo 'Testing...'
-                sh"""
-                docker exec ${CONTAINER_NAME} npm run test
                 """
             }
         }
