@@ -11,6 +11,7 @@ pipeline {
         CONTAINER_NAME = 'app_store'
         REPO_URL = 'https://github.com/bartodes/app-devops-bootcamp'
         REPO_DIR = 'app-devops-bootcamp'
+        NODE_NAME = 'docker-test' 
     }
     stages {
         stage('Clone') {
@@ -23,7 +24,7 @@ pipeline {
         }
         stage('Test') {
             steps {
-                nodejs(nodeJSInstallationName: 'docker-test'){
+                nodejs(nodeJSInstallationName: "${NODE_NAME}"){
                     echo 'Testing...'
                     sh """
                     cd ${DIR_NAME}
