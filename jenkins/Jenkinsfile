@@ -39,7 +39,6 @@ pipeline {
                 echo "Building... ID: ${BUILD_ID} URL: ${BUILD_URL}"
                 sh """
                 docker build -t ${params.REGISTRY}/${IMG_NAME}:${params.IMG_VERSION} ./${DIR_NAME}
-                docker container rm -f ${CONTAINER_NAME}
                 docker run -d -p 3000:3000 --name ${CONTAINER_NAME} ${params.REGISTRY}/${IMG_NAME}:${params.IMG_VERSION}
                 """
             }
