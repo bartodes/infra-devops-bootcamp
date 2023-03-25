@@ -12,7 +12,9 @@ pipeline {
         REPO_DIR = 'app-devops-bootcamp'
         NODE_NAME = 'nodejs:18.15.0' 
         DOCKER_CRED_ID = 'docker_creds'
-        GIT_CRED_ID = 'git_creds_k8'
+        K8_REPO = 'https://github.com/bartodes/kubernetes-devops-bootcamp.git'
+        K8_DIR = 'kubernetes-devops-bootcamp'
+        GIT_CRED_ID = 'git_k8'
     }
     stages {
         stage('Clone') {
@@ -40,7 +42,6 @@ pipeline {
                 echo "Building Docker Image..."
                 sh """
                 docker build -t ${params.REGISTRY}/${IMG_NAME}:${params.IMG_VERSION} ./${DIR_NAME}
-                docker run -d -p 3000:3000 --name ${CONTAINER_NAME} ${params.REGISTRY}/${IMG_NAME}:${params.IMG_VERSION}
                 """
             }
         }
@@ -61,23 +62,25 @@ pipeline {
             steps {
                 echo "Cloning K8s Manifest..."
                 sh"""
-                git clone 
-                cd ...
+                git clone ${K8_REPO}
                 """
+
                 echo "Updating K8s Manifest..."
                 sh"""
-                change the image version
+                cd ${K8_DIR}/base
+                sed -i 's ${params.REGISTRY}/${IMG_NAME}:.* ${params.REGISTRY}/${IMG_NAME}:${params.IMG_VERSION} g' deployment.yaml
                 """
-                echo "Pushing K8s Manifest..."
-                withCredentials([
-                    usernamePassword(credentialsId: "${GIT_CRED_ID}", usernameVariable: 'GIT_USER', passwordVariable: 'GIT_TOKEN')
-                ]){
-                    sh"""
-                    git add...
-                    git commit -m 'jenkins-${BUILD_ID}: updated the version of the image'
-                    git push...
-                    """
-                }
+                
+                // echo "Pushing K8s Manifest..."
+                // withCredentials([
+                //     usernamePassword(credentialsId: "${GIT_CRED_ID}", usernameVariable: 'GIT_USER', passwordVariable: 'GIT_TOKEN')
+                // ]){
+                //     sh"""
+                //     git add...
+                //     git commit -m 'jenkins-${BUILD_ID}: updated the version of the image'
+                //     git push...
+                //     """
+                // }
             }
         }
     }
@@ -85,9 +88,8 @@ pipeline {
         always {
             echo 'Deleting working files...'
             sh"""
-            rm -rf ${REPO_DIR}
+            rm -rf ${REPO_DIR} ${K8_DIR}
             docker rmi -f ${IMG_NAME}:${params.IMG_VERSION}
-            docker container rm -f ${CONTAINER_NAME}
             """
         }
     }
