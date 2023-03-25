@@ -3,7 +3,6 @@ pipeline {
     parameters {
         string(name: 'REGISTRY', description: 'The name of the docker registry to push the image. (<registry>/name:version)')
         string(name: 'IMG_VERSION', description: 'The version of the docker image to build. (registry/name:<version>)')
-        string(name: 'CREDS_ID', description: 'The ID of the credential. (in jenkins credential administrator)')
     }
     environment {
         DIR_NAME = 'app-devops-bootcamp/api-store'
@@ -12,6 +11,8 @@ pipeline {
         REPO_URL = 'https://github.com/bartodes/app-devops-bootcamp'
         REPO_DIR = 'app-devops-bootcamp'
         NODE_NAME = 'nodejs:18.15.0' 
+        DOCKER_CRED_ID = 'docker_creds'
+        GIT_CRED_ID = 'git_creds_k8'
     }
     stages {
         stage('Clone') {
@@ -25,7 +26,7 @@ pipeline {
         stage('Test') {
             steps {
                 nodejs(nodeJSInstallationName: "${NODE_NAME}"){
-                    echo 'Testing...'
+                    echo 'Testing app for building stage...'
                     sh """
                     cd ${DIR_NAME}
                     npm install
@@ -34,20 +35,20 @@ pipeline {
                 }
             }
         }
-        stage('Build') {
+        stage('Docker Build') {
             steps {
-                echo "Building... ID: ${BUILD_ID} URL: ${BUILD_URL}"
+                echo "Building Docker Image..."
                 sh """
                 docker build -t ${params.REGISTRY}/${IMG_NAME}:${params.IMG_VERSION} ./${DIR_NAME}
                 docker run -d -p 3000:3000 --name ${CONTAINER_NAME} ${params.REGISTRY}/${IMG_NAME}:${params.IMG_VERSION}
                 """
             }
         }
-        stage('Push') {
+        stage('Docker Push') {
             steps {
                 echo "Pushing Docker Image..."
                 withCredentials([
-                    usernamePassword(credentialsId: "${params.CREDS_ID}", usernameVariable: 'DOCKER_USR', passwordVariable: 'DOCKER_PSSWD')
+                    usernamePassword(credentialsId: "${DOCKER_CRED_ID}", usernameVariable: 'DOCKER_USR', passwordVariable: 'DOCKER_PSSWD')
                 ]){
                     sh """
                     docker login -u ${DOCKER_USR} -p ${DOCKER_PSSWD}
@@ -56,9 +57,32 @@ pipeline {
                 }
             }
         }
+        stage('K8s Update & Push'){
+            steps {
+                echo "Cloning K8s Manifest..."
+                sh"""
+                git clone 
+                cd ...
+                """
+                echo "Updating K8s Manifest..."
+                sh"""
+                change the image version
+                """
+                echo "Pushing K8s Manifest..."
+                withCredentials([
+                    usernamePassword(credentialsId: "${GIT_CRED_ID}", usernameVariable: 'GIT_USER', passwordVariable: 'GIT_TOKEN')
+                ]){
+                    sh"""
+                    git add...
+                    git commit -m 'jenkins-${BUILD_ID}: updated the version of the image'
+                    git push...
+                    """
+                }
+            }
+        }
     }
-    post{
-        always{
+    post {
+        always {
             echo 'Deleting working files...'
             sh"""
             rm -rf ${REPO_DIR}
