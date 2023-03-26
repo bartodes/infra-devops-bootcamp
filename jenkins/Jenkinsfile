@@ -53,7 +53,7 @@ pipeline {
                     usernamePassword(credentialsId: "${DOCKER_CRED_ID}", usernameVariable: 'DOCKER_USR', passwordVariable: 'DOCKER_PSSWD')
                 ]){
                     sh """
-                    docker login -u ${DOCKER_USR} -p ${DOCKER_PSSWD}
+                    docker login -u '${DOCKER_USR}' -p '${DOCKER_PSSWD}'
                     docker push ${IMG_NAME}:${params.IMG_TAG}
                     """
                 }
@@ -82,7 +82,7 @@ pipeline {
                     git config --global user.email "jenkins@ci.com"
                     git config --global user.name "Jenkins"
                     git add .
-                    git commit -m 'jenkins-${env.BUILD_ID}: updated the version of the image'
+                    git commit -m 'jenkins-${env.BUILD_ID}: updated the version of the image to ${params.IMG_TAG}'
                     git push https://${GIT_USER}:${GIT_TOKEN}@github.com/${GIT_USER}/${K8S_DIR}.git
                     """
                 }
