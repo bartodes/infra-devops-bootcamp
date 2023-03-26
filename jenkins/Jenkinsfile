@@ -2,68 +2,99 @@ pipeline {
     agent any
     parameters {
         string(name: 'REGISTRY', description: 'The name of the docker registry to push the image. (<registry>/name:version)')
-        string(name: 'IMG_VERSION', description: 'The version of the docker image to build. (registry/name:<version>)')
-        string(name: 'CREDS_ID', description: 'The ID of the credential. (in jenkins credential administrator)')
+        string(name: 'IMG_TAG', description: 'The version of the docker image to build. (registry/name:<version>)')
     }
     environment {
-        DIR_NAME = 'app-devops-bootcamp/api-store'
-        IMG_NAME = 'app-store-bootcamp'
-        CONTAINER_NAME = 'app_store'
-        REPO_URL = 'https://github.com/bartodes/app-devops-bootcamp'
-        REPO_DIR = 'app-devops-bootcamp'
-        NODE_NAME = 'nodejs:18.15.0' 
+        APP_DIR = 'app-devops-bootcamp'
+        K8S_DIR = 'k8s-devops-bootcamp'
+
+        APP_REPO = 'https://github.com/bartodes/app-devops-bootcamp.git'
+        K8S_REPO = 'https://github.com/bartodes/k8s-devops-bootcamp.git'
+        
+        IMG_NAME = "${REGISTRY}/api-store"
+        
+        NODEJS_ID = 'nodejs:18.15.0'
+        DOCKER_CRED_ID = 'dockerhub'
+        GIT_CRED_ID = 'github'
     }
     stages {
-        stage('Clone') {
+        stage('Clone'){
             steps {
                 echo 'Cloning...'
                 sh """
-                git clone ${REPO_URL}
+                git clone ${APP_REPO}
                 """
             }
         }
-        stage('Test') {
+        stage('Test'){
             steps {
-                nodejs(nodeJSInstallationName: "${NODE_NAME}"){
-                    echo 'Testing...'
+                nodejs(nodeJSInstallationName: "${NODEJS_ID}"){
+                    echo 'Testing app for building stage...'
                     sh """
-                    cd ${DIR_NAME}
+                    cd ${APP_DIR}/api-store
                     npm install
                     npm run test
                     """
                 }
             }
         }
-        stage('Build') {
+        stage('Docker Build'){
             steps {
-                echo "Building... ID: ${BUILD_ID} URL: ${BUILD_URL}"
+                echo "Building Docker Image..."
                 sh """
-                docker build -t ${params.REGISTRY}/${IMG_NAME}:${params.IMG_VERSION} ./${DIR_NAME}
-                docker run -d -p 3000:3000 --name ${CONTAINER_NAME} ${params.REGISTRY}/${IMG_NAME}:${params.IMG_VERSION}
+                docker build -t ${IMG_NAME}:${params.IMG_TAG} ./${APP_DIR}/api-store
                 """
             }
         }
-        stage('Push') {
+        stage('Docker Push'){
             steps {
                 echo "Pushing Docker Image..."
                 withCredentials([
-                    usernamePassword(credentialsId: "${params.CREDS_ID}", usernameVariable: 'DOCKER_USR', passwordVariable: 'DOCKER_PSSWD')
+                    usernamePassword(credentialsId: "${DOCKER_CRED_ID}", usernameVariable: 'DOCKER_USR', passwordVariable: 'DOCKER_PSSWD')
                 ]){
                     sh """
                     docker login -u ${DOCKER_USR} -p ${DOCKER_PSSWD}
-                    docker push ${params.REGISTRY}/${IMG_NAME}:${params.IMG_VERSION}
+                    docker push ${IMG_NAME}:${params.IMG_TAG}
+                    """
+                }
+            }
+        }
+        stage('K8s Update'){
+            steps {
+                echo "Cloning K8s Manifest..."
+                sh"git clone ${K8S_REPO}"
+
+                echo "Updating K8s Manifest..."
+                sh"""
+                cd ${K8S_DIR}/base
+                sed -i 's ${IMG_NAME}:.* ${IMG_NAME}:${params.IMG_TAG} g' deployment.yaml
+                """
+            }
+        }
+        stage('K8s Push'){
+            steps {
+                echo "Pushing K8s Manifest..."
+                withCredentials([
+                    usernamePassword(credentialsId: "${GIT_CRED_ID}", usernameVariable: 'GIT_USER', passwordVariable: 'GIT_TOKEN')
+                ]){
+                    sh"""
+                    cd ${K8S_DIR}
+                    git config --global user.email "jenkins@ci.com"
+                    git config --global user.name "Jenkins"
+                    git add .
+                    git commit -m 'jenkins-${env.BUILD_ID}: updated the version of the image'
+                    git push https://${GIT_USER}:${GIT_TOKEN}@github.com/${GIT_USER}/${K8S_DIR}.git
                     """
                 }
             }
         }
     }
-    post{
-        always{
+    post {
+        always {
             echo 'Deleting working files...'
             sh"""
-            rm -rf ${REPO_DIR}
-            docker rmi -f ${IMG_NAME}:${params.IMG_VERSION}
-            docker container rm -f ${CONTAINER_NAME}
+            rm -rf ${APP_DIR} ${K8S_DIR}
+            docker rmi -f ${IMG_NAME}:${params.IMG_TAG}
             """
         }
     }
