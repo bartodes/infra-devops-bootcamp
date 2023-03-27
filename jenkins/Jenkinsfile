@@ -71,6 +71,16 @@ pipeline {
                 """
             }
         }
+        // stage('K8s Update') {
+        //     steps {
+        //         echo "Updating K8s Manifest..."
+        //         sh """
+        //         cd ${K8S_DIR}/base
+        //         kustomize edit set image ${IMG_NAME}:${params.IMG_TAG}
+        //         kustomize build | kubectl apply -f -
+        //         """
+        //     }
+        // }
         stage('K8s Push'){
             steps {
                 echo "Pushing K8s Manifest..."
