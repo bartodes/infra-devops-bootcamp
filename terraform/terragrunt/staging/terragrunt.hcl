@@ -8,7 +8,7 @@ inputs = {
     root_vpc_name = "staging-vpc"
 
     root_ec2_name          = "staging-jenkins-ec2"
-    root_ec2_instance_type = "t2.micro"
+    root_ec2_instance_type = "t3.medium"
     root_key_name          = "default"
     
     root_sg_name  = "staging-jenkins-sg"    

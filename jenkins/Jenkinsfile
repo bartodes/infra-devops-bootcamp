@@ -35,6 +35,7 @@ pipeline {
                     npm install
                     npm run test
                     """
+                    //npm run test:e2e
                 }
             }
         }
