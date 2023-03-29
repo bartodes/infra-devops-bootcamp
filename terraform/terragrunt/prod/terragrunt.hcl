@@ -8,7 +8,7 @@ inputs = {
     root_vpc_name = "prod-vpc"
 
     root_ec2_name          = "prod-jenkins-ec2"
-    root_ec2_instance_type = "t2.micro"
+    root_ec2_instance_type = "t3.medium"
     root_key_name          = "default"
     
     root_sg_name  = "prod-jenkins-sg"    
