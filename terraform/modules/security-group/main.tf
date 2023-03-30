@@ -23,7 +23,7 @@ resource "aws_security_group" "main_sg" {
     }
 
     tags = {
-        Terraform   = true
+        Terraform   = "true"
         Name        = var.sg_name
         Environment = var.environment
     }
