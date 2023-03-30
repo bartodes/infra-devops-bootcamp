@@ -2,6 +2,7 @@ terraform {
     source = "../../"
 }
 
+
 inputs = {
     root_environment = "staging"
     
@@ -9,7 +10,7 @@ inputs = {
 
     root_ec2_name          = "staging-jenkins-ec2"
     root_ec2_instance_type = "t3.medium"
-    root_key_name          = "default" #Create a key pair before
+    root_key_name          = "tf-devops" #Create a key pair before
     
     root_sg_name  = "staging-jenkins-sg"    
     
@@ -18,6 +19,7 @@ inputs = {
     root_node_group_instances_type = ["t2.micro"]
 }
 
-// include {
-//     path = find_in_parent_folders()
-// }
+
+include {
+    path = find_in_parent_folders()
+}

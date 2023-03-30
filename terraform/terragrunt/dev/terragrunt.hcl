@@ -2,6 +2,7 @@ terraform {
     source = "../../"
 }
 
+
 inputs = {
     root_environment = "dev"
     
@@ -18,6 +19,7 @@ inputs = {
     root_node_group_instances_type = ["t2.micro"]
 }
 
-// include {
-//     path = find_in_parent_folders()
-// }
+
+include {
+    path = find_in_parent_folders()
+}

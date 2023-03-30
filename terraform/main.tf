@@ -5,6 +5,7 @@ module "vpc_root" {
     vpc_name = var.root_vpc_name
 }
 
+
 module "ec2_instance_root" {
     source = "./modules/ec2"
 
@@ -19,6 +20,7 @@ module "ec2_instance_root" {
     ec2_user_data   = "${file("user_data/jenkins.sh")}"
 }
 
+
 module "sg_root" {
     source = "./modules/security-group"
 
@@ -27,6 +29,7 @@ module "sg_root" {
     environment = var.root_environment
     sg_name     = var.root_sg_name
 }
+
 
 module "eks_root" {
     source = "./modules/eks"

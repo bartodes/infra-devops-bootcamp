@@ -27,16 +27,16 @@ variable "root_sg_name" {
 }
 
 variable "root_cluster_name" {
-    description = "The name of the cluster"
+    description = "The name of the cluster."
     type = string
 }
 
 variable "root_cluster_version" {
-    description = "The version of the cluster"
+    description = "The version of the cluster."
     type = string
 }
 
 variable "root_node_group_instances_type" {
-    description = "The node group instances"
+    description = "The node group instances type."
     type = list(string)
 }
