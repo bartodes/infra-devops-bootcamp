@@ -82,21 +82,21 @@ pipeline {
         //         """
         //     }
         // }
-        stage('K8s Push'){
-            steps {
-                echo "Pushing K8s Manifest..."
-                withCredentials([
-                    usernamePassword(credentialsId: "${GIT_CRED_ID}", usernameVariable: 'GIT_USER', passwordVariable: 'GIT_TOKEN')
-                ]){
-                    sh"""
-                    cd ${K8S_DIR}
-                    git config --global user.email "jenkins@ci.com"
-                    git config --global user.name "Jenkins"
-                    git add .
-                    git commit -m 'jenkins-${env.BUILD_ID}: updated the version of the image to ${params.IMG_TAG}'
-                    git push https://${GIT_USER}:${GIT_TOKEN}@github.com/${GIT_USER}/${K8S_DIR}.git
-                    """
-                }
+//        stage('K8s Push'){
+//            steps {
+//                echo "Pushing K8s Manifest..."
+//                withCredentials([
+//                    usernamePassword(credentialsId: "${GIT_CRED_ID}", usernameVariable: 'GIT_USER', passwordVariable: 'GIT_TOKEN')
+//                ]){
+//                    sh"""
+//                    cd ${K8S_DIR}
+//                    git config --global user.email "jenkins@ci.com"
+//                    git config --global user.name "Jenkins"
+//                    git add .
+//                    git commit -m 'jenkins-${env.BUILD_ID}: updated the version of the image to ${params.IMG_TAG}'
+//                    git push https://${GIT_USER}:${GIT_TOKEN}@github.com/${GIT_USER}/${K8S_DIR}.git
+//                    """
+//                }
             }
         }
     }
