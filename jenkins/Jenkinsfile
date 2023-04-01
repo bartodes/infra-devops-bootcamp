@@ -67,8 +67,8 @@ pipeline {
 
                 echo "Updating K8s Manifest..."
                 sh"""
-                cd ${K8S_DIR}/base
-                sed -i 's ${IMG_NAME}:.* ${IMG_NAME}:${params.IMG_TAG} g' deployment.yaml
+                cd ${K8S_DIR}/environments/dev
+                sed -i 's ${IMG_NAME}:.* ${IMG_NAME}:${params.IMG_TAG} g' kustomization.yaml
                 """
             }
         }
@@ -93,7 +93,7 @@ pipeline {
                     git config --global user.email "jenkins@ci.com"
                     git config --global user.name "Jenkins"
                     git add .
-                    git commit -m 'jenkins-${env.BUILD_ID}: updated the version of the image to ${params.IMG_TAG}'
+                    git commit -m 'jenkins-${env.BUILD_ID}: updated the version of the image to ${params.IMG_TAG} in dev environment'
                     git push https://${GIT_USER}:${GIT_TOKEN}@github.com/${GIT_USER}/${K8S_DIR}.git
                     """
                 }
