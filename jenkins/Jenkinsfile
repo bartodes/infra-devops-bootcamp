@@ -11,7 +11,7 @@ pipeline {
         APP_REPO = 'https://github.com/bartodes/app-devops-bootcamp.git'
         K8S_REPO = 'https://github.com/bartodes/k8s-devops-bootcamp.git'
         
-        IMG_NAME = "${REGISTRY}/api-store"
+        IMG_NAME = "${params.REGISTRY}/api-store"
         
         NODEJS_ID = 'nodejs:18.15.0'
         DOCKER_CRED_ID = 'dockerhub'
