@@ -112,7 +112,7 @@ pipeline {
         always {
             echo 'Deleting working files...'
             sh"""
-            rm -rf ${APP_DIR} ${K8S_DIR} ${ISSUE_BODY_FILE} tmpToken.txt
+            rm -rf ${APP_DIR} ${K8S_DIR} ${APP_DIR}/api-store${ISSUE_BODY_FILE} ${APP_DIR}/api-storetmpToken.txt
             docker rmi -f ${IMG_NAME}:${params.IMG_TAG}
             """
         }
