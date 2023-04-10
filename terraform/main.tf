@@ -20,6 +20,19 @@ module "ec2_instance_root" {
     ec2_user_data   = "${file("user_data/jenkins.sh")}"
 }
 
+module "ec2_instance_bastion_root" {
+    source = "./modules/ec2"
+
+    private_subnets = module.vpc_root.public_subnets_id[0]      
+    ec2_sg          = [module.sg_root.sg_id]
+
+    environment     = var.root_environment            
+    ec2_name        = "bastion_server"                          
+    instance_type   = var.root_ec2_instance_type
+    key_name        = var.root_key_name
+
+    ec2_user_data   = ""
+}
 
 module "sg_root" {
     source = "./modules/security-group"
