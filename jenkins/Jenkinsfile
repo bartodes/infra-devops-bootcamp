@@ -16,6 +16,9 @@ pipeline {
         NODEJS_ID = 'nodejs:18.15.0'
         DOCKER_CRED_ID = 'dockerhub'
         GIT_CRED_ID = 'github'
+
+        ISSUE_TITLE = "Error en el build: ${env.BUILD_ID}"
+        ISSUE_BODY_FILE = 'issue-body.txt'
     }
     stages {
         stage('Clone'){
@@ -35,9 +38,24 @@ pipeline {
                     npm install
                     npm run test
                     """
-                    //npm run test:e2e
                 }
             }
+            post{
+                failure {
+                    nodejs(nodeJSInstallationName: "${NODEJS_ID}"){
+                        sh "npm audit > ${ISSUE_BODY_FILE}"
+                        withCredentials([
+                            usernamePassword(credentialsId: "${GIT_CRED_ID}", usernameVariable: 'GIT_USER', passwordVariable: 'GIT_TOKEN')
+                        ]){
+                            sh """
+                            echo ${GIT_TOKEN} > tmpToken.txt
+                            gh auth login --with-token < tmpToken.txt
+                            gh issue create -t '${ISSUE_TITLE}' -F ${ISSUE_BODY_FILE} -R ${K8S_REPO}
+                            """
+                        }    
+                    }
+                }
+        }
         }
         stage('Docker Build'){
             steps {
@@ -72,16 +90,6 @@ pipeline {
                 """
             }
         }
-        // stage('K8s Update') {
-        //     steps {
-        //         echo "Updating K8s Manifest..."
-        //         sh """
-        //         cd ${K8S_DIR}/base
-        //         kustomize edit set image ${IMG_NAME}:${params.IMG_TAG}
-        //         kustomize build | kubectl apply -f -
-        //         """
-        //     }
-        // }
         stage('K8s Push'){
             steps {
                 echo "Pushing K8s Manifest..."
@@ -94,7 +102,7 @@ pipeline {
                     git config --global user.name "Jenkins"
                     git add .
                     git commit -m 'jenkins-${env.BUILD_ID}: updated the version of the image to ${params.IMG_TAG} in dev environment'
-                    git push https://${GIT_USER}:${GIT_TOKEN}@github.com/${GIT_USER}/${K8S_DIR}.git
+                    git push https://${GIT_USER}:'${GIT_TOKEN}'@github.com/${GIT_USER}/${K8S_DIR}.git
                     """
                 }
             }
@@ -104,7 +112,7 @@ pipeline {
         always {
             echo 'Deleting working files...'
             sh"""
-            rm -rf ${APP_DIR} ${K8S_DIR}
+            rm -rf ${APP_DIR} ${K8S_DIR} ${ISSUE_BODY_FILE} tmpToken.txt
             docker rmi -f ${IMG_NAME}:${params.IMG_TAG}
             """
         }
