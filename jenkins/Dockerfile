@@ -1,6 +1,8 @@
 FROM jenkins/jenkins:2.387.1
 USER root
-RUN apt-get update && apt-get install -y lsb-release
+RUN apt-get update && apt-get -y install lsb-release \ 
+    apt-transport-https ca-certificates curl \
+    gnupg2 software-properties-common
 RUN curl -fsSLo /usr/share/keyrings/githubcli-archive-keyring.gpg https://cli.github.com/packages/githubcli-archive-keyring.gpg 
 RUN echo "deb [arch=$(dpkg --print-architecture) \
     signed-by=/usr/share/keyrings/githubcli-archive-keyring.gpg] \
