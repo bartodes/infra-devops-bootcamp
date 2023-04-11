@@ -6,7 +6,7 @@ services:
     restart: always
     privileged: true
     networks:
-      jenkins:
+      docker:
         aliases:
           - docker
     environment:
@@ -21,7 +21,8 @@ services:
     container_name: jenkins_nodejs
     restart: always
     networks:
-      - jenkins
+      - docker
+    tty: true
     environment:
       DOCKER_HOST: tcp://docker:2376
       DOCKER_CERT_PATH: /certs/client
@@ -38,4 +39,4 @@ volumes:
   jenkins-data:
 
 networks:
-  jenkins:
+  docker:
