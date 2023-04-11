@@ -6,7 +6,9 @@ RUN echo "deb [arch=$(dpkg --print-architecture) \
     signed-by=/usr/share/keyrings/githubcli-archive-keyring.gpg] \
     https://cli.github.com/packages \
     $(lsb_release -cs) main" > /etc/apt/sources.list.d/github-cli.list
-RUN apt update && apt install gh
+RUN apt-get update && apt-get install -y gh
+RUN curl https://static.snyk.io/cli/latest/snyk-linux -o snyk
+RUN chmod +x ./snyk && mv ./snyk /usr/local/bin/
 RUN curl -fsSLo /usr/share/keyrings/docker-archive-keyring.asc \
     https://download.docker.com/linux/debian/gpg
 RUN echo "deb [arch=$(dpkg --print-architecture) \
