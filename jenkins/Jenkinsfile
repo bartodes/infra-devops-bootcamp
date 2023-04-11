@@ -1,8 +1,7 @@
 pipeline {
     agent any
     parameters {
-        string(name: 'REGISTRY', description: 'The name of the docker registry to push the image. (<registry>/name:version)')
-        string(name: 'IMG_TAG', description: 'The version of the docker image to build. (registry/name:<version>)')
+        string(name: 'IMG_TAG', description: 'The version of the docker image to build. (registry/name:<tag>)')
     }
     environment {
         APP_DIR = 'app-devops-bootcamp'
@@ -11,8 +10,9 @@ pipeline {
         APP_REPO = 'https://github.com/bartodes/app-devops-bootcamp.git'
         K8S_REPO = 'https://github.com/bartodes/k8s-devops-bootcamp.git'
         
-        IMG_NAME = "${params.REGISTRY}/api-store"
-        
+        REGISTRY = 'bartodes/api-store'
+        DOCKER_IMG = "${REGISTRY}:${params.IMG_TAG}"
+
         NODEJS_ID = 'nodejs:18.15.0'
         DOCKER_CRED_ID = 'dockerhub'
         GIT_CRED_ID = 'github'
@@ -24,9 +24,7 @@ pipeline {
         stage('Clone'){
             steps {
                 echo 'Cloning...'
-                sh """
-                git clone ${APP_REPO}
-                """
+                sh "git clone ${APP_REPO}"
             }
         }
         stage('Test'){
@@ -40,7 +38,7 @@ pipeline {
                     """
                 }
             }
-            post{
+            post {
                 failure {
                     nodejs(nodeJSInstallationName: "${NODEJS_ID}"){
                         sh "npm audit > ${ISSUE_BODY_FILE}"
@@ -52,17 +50,25 @@ pipeline {
                             gh auth login --with-token < tmpToken.txt
                             gh issue create -t '${ISSUE_TITLE}' -F ${ISSUE_BODY_FILE} -R ${K8S_REPO}
                             """
-                        }    
+                        }
                     }
                 }
+            }
         }
+        stage('Scan'){
+            steps {
+                echo "Searching for Package Vulnerabilities..."
+                snykSecurity(
+                    snykInstallation: 'snyk',
+                    snykTokenId: 'snyk-api-token',
+                    additionalArguments: '--project-name=api-store-package'
+                )
+            }
         }
         stage('Docker Build'){
             steps {
                 echo "Building Docker Image..."
-                sh """
-                docker build -t ${IMG_NAME}:${params.IMG_TAG} ./${APP_DIR}/api-store
-                """
+                sh "docker build -t ${DOCKER_IMG} ./${APP_DIR}/api-store"
             }
         }
         stage('Docker Push'){
@@ -72,34 +78,28 @@ pipeline {
                     usernamePassword(credentialsId: "${DOCKER_CRED_ID}", usernameVariable: 'DOCKER_USR', passwordVariable: 'DOCKER_PSSWD')
                 ]){
                     sh """
-                    docker login -u '${DOCKER_USR}' -p '${DOCKER_PSSWD}'
-                    docker push ${IMG_NAME}:${params.IMG_TAG}
+                    echo -n ${DOCKER_PSSWD} | docker login -u '${DOCKER_USR}' --password-stdin
+                    docker push ${DOCKER_IMG}
                     """
                 }
             }
         }
         stage('K8s Update'){
             steps {
-                echo "Cloning K8s Manifest..."
-                sh"git clone ${K8S_REPO}"
-
                 echo "Updating K8s Manifest..."
                 sh"""
+                git clone ${K8S_REPO}
                 cd ${K8S_DIR}/environments/dev
-                sed -i 's ${IMG_NAME}:.* ${IMG_NAME}:${params.IMG_TAG} g' kustomization.yaml
+                sed -i 's ${REGISTRY}:.* ${DOCKER_IMG} g' kustomization.yaml
                 """
-            }
-        }
-        stage('K8s Push'){
-            steps {
                 echo "Pushing K8s Manifest..."
                 withCredentials([
                     usernamePassword(credentialsId: "${GIT_CRED_ID}", usernameVariable: 'GIT_USER', passwordVariable: 'GIT_TOKEN')
                 ]){
+                    // git config --global user.email "jenkins@ci.com"
+                    // git config --global user.name "Jenkins"
                     sh"""
                     cd ${K8S_DIR}
-                    git config --global user.email "jenkins@ci.com"
-                    git config --global user.name "Jenkins"
                     git add .
                     git commit -m 'jenkins-${env.BUILD_ID}: updated the version of the image to ${params.IMG_TAG} in dev environment'
                     git push https://${GIT_USER}:'${GIT_TOKEN}'@github.com/${GIT_USER}/${K8S_DIR}.git
@@ -112,8 +112,8 @@ pipeline {
         always {
             echo 'Deleting working files...'
             sh"""
-            rm -rf ${APP_DIR} ${K8S_DIR} ${APP_DIR}/api-store${ISSUE_BODY_FILE} ${APP_DIR}/api-storetmpToken.txt
-            docker rmi -f ${IMG_NAME}:${params.IMG_TAG}
+            rm -rf ${APP_DIR} ${K8S_DIR}
+            docker rmi -f ${DOCKER_IMG}
             """
         }
     }
