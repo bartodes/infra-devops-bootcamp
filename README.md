@@ -1,6 +1,6 @@
                                                            #Arquitectura General
 
-![](./Images/Infraestructura.jpg)
+![](./images/Infraestructura.jpg)
 
 
 ## Repos usados
