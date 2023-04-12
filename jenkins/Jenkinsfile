@@ -1,8 +1,5 @@
 pipeline {
     agent any
-    parameters {
-        string(name: 'IMG_TAG', description: 'The version of the docker image to build. (registry/name:<tag>)')
-    }
     environment {
         APP_DIR = 'app-devops-bootcamp'
         K8S_DIR = 'k8s-devops-bootcamp'
@@ -11,7 +8,8 @@ pipeline {
         K8S_REPO = 'https://github.com/bartodes/k8s-devops-bootcamp.git'
         
         REGISTRY = 'bartodes/api-store'
-        DOCKER_IMG = "${REGISTRY}:${params.IMG_TAG}"
+        IMG_TAG = "0.0.${env.BUILD_NUMBER}"
+        DOCKER_IMG = "${REGISTRY}:${IMG_TAG}"
 
         NODEJS_ID = 'nodejs:18.15.0'
         DOCKER_CRED_ID = 'dockerhub'
@@ -55,20 +53,20 @@ pipeline {
                 }
             }
         }
-        stage('Scan'){
-            steps {
-                echo "Searching for Package Vulnerabilities..."
-                snykSecurity(
-                    snykInstallation: 'snyk',
-                    snykTokenId: 'snyk-api-token',
-                    additionalArguments: '--project-name=api-store-package'
-                )
-            }
-        }
         stage('Docker Build'){
             steps {
                 echo "Building Docker Image..."
                 sh "docker build -t ${DOCKER_IMG} ./${APP_DIR}/api-store"
+            }
+        }
+        stage('Image Scan'){
+            steps {
+                echo "Searching for Vulnerabilities in the Image..."
+                withCredentials([string(credentialsId: 'snyk-api-token', variable: 'SNYK_TOKEN')]){
+                    sh 'snyk auth $SNYK_TOKEN'
+                    sh "snyk container test $DOCKER_IMG --json --severity-threshold=low "
+                    sh "snyk container monitor $DOCKER_IMG --severity-threshold=low  --project-name=$IMG_TAG"
+                }
             }
         }
         stage('Docker Push'){
@@ -96,14 +94,14 @@ pipeline {
                 withCredentials([
                     usernamePassword(credentialsId: "${GIT_CRED_ID}", usernameVariable: 'GIT_USER', passwordVariable: 'GIT_TOKEN')
                 ]){
-                    // git config --global user.email "jenkins@ci.com"
-                    // git config --global user.name "Jenkins"
                     sh"""
+                    git config --global user.email "jenkins@ci.com"
+                    git config --global user.name "Jenkins"
                     cd ${K8S_DIR}
                     git add .
-                    git commit -m 'jenkins-${env.BUILD_ID}: updated the version of the image to ${params.IMG_TAG} in dev environment'
-                    git push https://${GIT_USER}:'${GIT_TOKEN}'@github.com/${GIT_USER}/${K8S_DIR}.git
+                    git commit -m 'jenkins-${env.BUILD_ID}: updated the version of the image to ${IMG_TAG} in dev environment'
                     """
+                    sh 'cd $K8S_DIR && git push https://$GIT_USER:$GIT_TOKEN@github.com/$GIT_USER/$K8S_DIR.git'
                 }
             }
         }
