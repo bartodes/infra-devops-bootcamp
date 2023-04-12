@@ -6,7 +6,7 @@ services:
     restart: always
     privileged: true
     networks:
-      docker:
+      jenkins:
         aliases:
           - docker
     environment:
@@ -17,26 +17,26 @@ services:
     ports:
       - "2376:2376"
   jenkins:
-    image: bartodes/jenkins-nodejs:2.387.1
+    image: bartodes/jenkins-nodejs:lts-snyk-cli
     container_name: jenkins_nodejs
     restart: always
     networks:
-      - docker
-    tty: true
+      - jenkins
     environment:
       DOCKER_HOST: tcp://docker:2376
       DOCKER_CERT_PATH: /certs/client
       DOCKER_TLS_VERIFY: 1
     volumes:
-      - jenkins-docker-certs:/certs/client:ro
       - jenkins-data:/var/jenkins_home
+      - jenkins-docker-certs:/certs/client:ro
+      - /var/run/docker.sock:/var/run/docker.sock
     ports:
       - "8080:8080"
       - "50000:50000"
 
 volumes:
-  jenkins-docker-certs:
   jenkins-data:
+  jenkins-docker-certs:
 
 networks:
-  docker:
+  jenkins:
