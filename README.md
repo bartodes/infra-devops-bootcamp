@@ -5,9 +5,9 @@
 
 ## Repos usados
 
-➡️ Infraestructura > https://github.com/edgaregonzalez/app-devops-bootcamp
+➡️ App (forked) > https://github.com/bartodes/app-devops-bootcamp
 
-➡️ Configuración ArgoCD > https://github.com/bartodes/k8s-devops-bootcamp.git
+➡️ ArgoCD > https://github.com/bartodes/k8s-devops-bootcamp
 
 
 
