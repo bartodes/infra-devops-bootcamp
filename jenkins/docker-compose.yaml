@@ -17,7 +17,7 @@ services:
     ports:
       - "2376:2376"
   jenkins:
-    image: bartodes/jenkins-nodejs:lts-snyk-cli
+    image: bartodes/jenkins-nodejs:lts-snyk-cli.1
     container_name: jenkins_nodejs
     restart: always
     networks:
