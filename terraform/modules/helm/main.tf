@@ -10,5 +10,5 @@ resource "helm_release" "argocd" {
 
     repository = "https://argoproj.github.io/argo-helm"
     chart      = "argo-cd"
-    values     = var.values_file
+    values     = [var.values_file]
 }
