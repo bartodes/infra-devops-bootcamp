@@ -20,6 +20,7 @@ module "ec2_instance_root" {
     ec2_user_data   = "${file("user_data/jenkins.sh")}"
 }
 
+
 module "ec2_instance_bastion_root" {
     source = "./modules/ec2"
 
@@ -33,6 +34,7 @@ module "ec2_instance_bastion_root" {
 
     ec2_user_data   = ""
 }
+
 
 module "sg_root" {
     source = "./modules/security-group"
@@ -55,4 +57,15 @@ module "eks_root" {
     environment               = var.root_environment
     cluster_name              = var.root_cluster_name
     cluster_version           = var.root_cluster_version
+}
+
+
+module "helm_root" {
+    source = "./modules/helm"
+
+    cluster_endpoint       = module.eks_root.cluster_endpoint
+    cluster_ca_certificate = module.eks_root.cluster_ca_certificate
+    cluster_name           = module.eks_root.cluster_name
+    
+    values_file = file("argocd/${var.root_environment}")
 }
