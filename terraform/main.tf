@@ -6,7 +6,7 @@ module "vpc_root" {
 }
 
 
-module "ec2_instance_root" {
+module "ec2_jenkins_root" {
     source = "./modules/ec2"
 
     private_subnets = module.vpc_root.private_subnets_id[0]      
@@ -17,11 +17,11 @@ module "ec2_instance_root" {
     instance_type   = var.root_ec2_instance_type
     key_name        = var.root_key_name
 
-    ec2_user_data   = "${file("user_data/jenkins.sh")}"
+    ec2_user_data   = file("user_data/jenkins.sh")
 }
 
 
-module "ec2_instance_bastion_root" {
+module "ec2_bastion_root" {
     source = "./modules/ec2"
 
     private_subnets = module.vpc_root.public_subnets_id[0]      
