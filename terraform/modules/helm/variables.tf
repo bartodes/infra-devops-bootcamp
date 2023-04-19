@@ -1,9 +1,9 @@
-variable "endpoint" {
+variable "cluster_endpoint" {
     type = string
     description = "The cluster endpoint."
 }
 
-variable "ca_certificate" {
+variable "cluster_ca_certificate" {
     type = null
     description = "The base64 cluster certificate."
 }
