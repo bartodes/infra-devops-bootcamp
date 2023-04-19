@@ -1,0 +1,20 @@
+apiVersion: argoproj.io/v1alpha1
+kind: Application
+metadata:
+  name: staging-app
+  namespace: argocd
+spec:
+  destination:
+    namespace: staging-api
+    server: 'https://kubernetes.default.svc'
+  source:
+    path: environments/staging
+    repoURL: 'https://github.com/bartodes/k8s-devops-bootcamp.git'
+    targetRevision: HEAD
+  project: default
+  syncPolicy:
+    syncOptions:
+      - CreateNamespace=true
+    automated:
+      prune: true
+      selfHeal: true
