@@ -67,5 +67,5 @@ module "helm_root" {
     cluster_ca_certificate = module.eks_root.cluster_ca_certificate
     cluster_name           = module.eks_root.cluster_name
     
-    values_file = file("argocd/${var.root_environment}")
+    values_file = file("argocd/${var.root_environment}-app.yaml")
 }
