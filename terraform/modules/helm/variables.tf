@@ -8,6 +8,11 @@ variable "cluster_ca_certificate" {
     description = "The base64 cluster certificate."
 }
 
+variable "cluster_name" {
+    type = string
+    description = "The name of the cluster."
+}
+
 variable "values_file" {
     type = null
     description = "The file of argocd app."
