@@ -14,6 +14,8 @@ terraform {
             source = "hashicorp/helm"
             version = "2.9.0"
         }
+
+        #Que provider para deployar la application de argocd?
     }
 }
 
@@ -22,10 +24,10 @@ provider "aws" {
 }
 
 provider "kubernetes" {
-    host = var.cluster_endpoint
+    host        = var.cluster_endpoint
     
     cluster_ca_certificate = base64decode(var.cluster_ca_certificate)
-    
+
     exec {
         api_version = "client.authentication.k8s.io/v1beta1"
         args        = ["eks", "get-token", "--cluster-name", var.cluster_name]
@@ -35,7 +37,7 @@ provider "kubernetes" {
 
 provider "helm" {
     kubernetes {
-        host = var.cluster_endpoint
+        host        = var.cluster_endpoint
 
         cluster_ca_certificate = base64decode(var.cluster_ca_certificate)
         
