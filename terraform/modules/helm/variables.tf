@@ -15,3 +15,8 @@ variable "cluster_name" {
 variable "values_file" {
     description = "The file of argocd app."
 }
+
+variable "cluster_oidc_provider_url" {
+    type = string
+    description = "The Open ID Connect identity provider."
+}
