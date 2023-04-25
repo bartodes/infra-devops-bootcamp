@@ -28,15 +28,13 @@ module "eks" {
     AmazonEKSServicePolicy = "arn:aws:iam::aws:policy/AmazonEKSServicePolicy"
   }
 
-  manage_aws_auth_configmap = true
-
   eks_managed_node_groups = {
     green = {
       min_size     = 1
       max_size     = 3
       desired_size = 1
 
-      instance_types = ["t2.micro"]
+      instance_types = ["t3.medium"]
       capacity_type  = "SPOT"
     }
   }
