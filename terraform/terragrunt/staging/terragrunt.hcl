@@ -15,8 +15,8 @@ inputs = {
     root_sg_name  = "staging-jenkins-sg"    
     
     root_cluster_name              = "staging-cluster"
-    root_cluster_version           = "1.24"
-    root_node_group_instances_type = ["t2.micro"]
+    root_cluster_version           = "1.26"
+    root_node_group_instances_type = ["t3.medium"]
 }
 
 
