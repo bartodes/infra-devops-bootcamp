@@ -39,6 +39,8 @@ module "eks" {
     }
   }
 
+  enable_irsa  = true
+
   tags = {
     Environment = var.environment
     Terraform   = "true"
