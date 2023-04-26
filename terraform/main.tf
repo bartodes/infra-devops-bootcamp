@@ -6,7 +6,7 @@ module "vpc_root" {
 }
 
 
-module "ec2_instance_root" {
+module "ec2_jenkins_root" {
     source = "./modules/ec2"
 
     private_subnets = module.vpc_root.private_subnets_id[0]      
@@ -17,10 +17,11 @@ module "ec2_instance_root" {
     instance_type   = var.root_ec2_instance_type
     key_name        = var.root_key_name
 
-    ec2_user_data   = "${file("user_data/jenkins.sh")}"
+    ec2_user_data   = file("user_data/jenkins.sh")
 }
 
-module "ec2_instance_bastion_root" {
+
+module "ec2_bastion_root" {
     source = "./modules/ec2"
 
     private_subnets = module.vpc_root.public_subnets_id[0]      
@@ -33,6 +34,7 @@ module "ec2_instance_bastion_root" {
 
     ec2_user_data   = ""
 }
+
 
 module "sg_root" {
     source = "./modules/security-group"
@@ -48,6 +50,8 @@ module "eks_root" {
     source = "./modules/eks"
 
     vpc_id                        = module.vpc_root.vpc_id
+    # private_subnets_cluster       = module.vpc_root.public_subnets_id
+    # private_subnets_control_plane = module.vpc_root.public_subnets_id
     private_subnets_cluster       = module.vpc_root.private_subnets_id
     private_subnets_control_plane = module.vpc_root.private_subnets_id
 
@@ -55,4 +59,14 @@ module "eks_root" {
     environment               = var.root_environment
     cluster_name              = var.root_cluster_name
     cluster_version           = var.root_cluster_version
+}
+
+
+module "helm_root" {
+    source = "./modules/helm"
+
+    cluster_endpoint          = module.eks_root.cluster_endpoint
+    cluster_ca_certificate    = module.eks_root.cluster_ca_certificate
+    cluster_name              = module.eks_root.cluster_name
+    cluster_oidc_provider_url = module.eks_root.cluster_oidc_provider_url
 }
