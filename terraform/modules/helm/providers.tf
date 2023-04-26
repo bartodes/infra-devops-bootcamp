@@ -15,7 +15,10 @@ terraform {
             version = "2.9.0"
         }
 
-        #Que provider para deployar la application de argocd?
+        # argocd = {
+        #     source = "jojand/argocd"
+        #     version = "2.3.2"
+        # }
     }
 }
 
@@ -48,3 +51,24 @@ provider "helm" {
         }
     }
 }
+
+# provider "argocd" {
+#     kubernetes {
+#         host        = var.cluster_endpoint
+
+#         cluster_ca_certificate = base64decode(var.cluster_ca_certificate)
+        
+#         exec {
+#             api_version = "client.authentication.k8s.io/v1beta1"
+#             args        = ["eks", "get-token", "--cluster-name", var.cluster_name]
+#             command     = "aws"
+#         }
+#     }
+#     # ArgoCd server. Load balancer dns hostname with port 443 (you have to add into /etc/hosts file: <IP_OF_LB> <HOST_NAME_OF_LB>)
+#     server_addr = "lb.aws:443"
+#     # ArgoCd credentials
+#     username = "admin"
+#     password = "" #The initial admin password decoded
+#     # Insecure flag to avoid using a tls cert
+#     insecure = true
+# }
