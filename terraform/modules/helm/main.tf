@@ -21,8 +21,7 @@ resource "helm_release" "argocd" {
 
     repository = "https://argoproj.github.io/argo-helm"
     chart      = "argo-cd"
-    # values     = [var.values_file]
-
+    values = [ file("${path.module}/values/values.yaml") ]
 
     set {
         name  = "server.service.type"
@@ -49,3 +48,35 @@ resource "helm_release" "argocd" {
         module.iam_assumable_role_oidc
     ]
 }
+
+# Attempting to create the application from terraform, instead of manually applying the yaml file into argocd server.
+
+# resource "argocd_application" "api-store" {
+#     metadata {
+#         name = "dev-app"
+#         namespace = "argocd"
+#     }
+
+#     spec {
+#         destination {
+#             namespace = "dev-api"
+#             server = "https://kubernetes.default.svc"
+#         }
+#         source {
+#             path = "environments/dev"
+#             repo_url = "https://github.com/bartodes/k8s-devops-bootcamp.git"
+#             target_revision = "HEAD"
+#         }
+#         sync_policy {
+#             sync_options = [ "CreateNamespace=true" ]
+#             automated = {
+#                 prune       = true
+#                 self_heal   = true
+#             }
+#         }
+#     }
+    
+#     depends_on = [
+#         helm_release.argocd
+#     ]
+# }
