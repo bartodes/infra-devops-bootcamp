@@ -1,5 +1,5 @@
 locals {
-    env    = path_relative_to_include()
+    env = path_relative_to_include()
 }
 
 
