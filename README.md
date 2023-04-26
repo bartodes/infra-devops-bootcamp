@@ -7,7 +7,7 @@
 
 ➡️ App (forked) > https://github.com/bartodes/app-devops-bootcamp
 
-➡️ ArgoCD > https://github.com/bartodes/k8s-devops-bootcamp
+➡️ Kubernetes > https://github.com/bartodes/k8s-devops-bootcamp
 
 
 
