@@ -21,7 +21,7 @@ resource "helm_release" "argocd" {
 
     repository = "https://argoproj.github.io/argo-helm"
     chart      = "argo-cd"
-    values = [ file("${path.module}/values/values.yaml") ]
+    values     = [ file("${path.module}/values/values.yaml") ]
 
     set {
         name  = "server.service.type"
@@ -42,6 +42,9 @@ resource "helm_release" "argocd" {
         name  = "server.serviceAccount.annotations.eks\\.amazonaws\\.com/role-arn"
         value = module.iam_assumable_role_oidc.iam_role_arn
     }
+
+    force_update = true
+    cleanup_on_fail = true
     
     depends_on = [
         kubernetes_namespace.argocd,
