@@ -70,3 +70,21 @@ module "helm_root" {
     cluster_name              = module.eks_root.cluster_name
     cluster_oidc_provider_url = module.eks_root.cluster_oidc_provider_url
 }
+
+resource "null_resource" "clean_up_argocd_resources" {
+    triggers = {
+        eks_cluster_name = var.root_cluster_name
+    }
+
+    provisioner "local-exec" {
+        command     = <<-EOT
+        kubeconfig=/tmp/tf.clean_up_argocd.kubeconfig.yaml
+        aws eks update-kubeconfig --name ${self.triggers.eks_cluster_name} --kubeconfig $kubeconfig
+        rm -f /tmp/tf.clean_up_argocd_resources.err.log
+        kubectl --kubeconfig $kubeconfig get Application -A -o name | xargs -I {} kubectl --kubeconfig $kubeconfig -n argocd patch -p '{"metadata":{"finalizers":null}}' --type=merge {} 2> /tmp/tf.clean_up_argocd_resources.err.log || true
+        rm -f $kubeconfig
+        EOT
+        interpreter = ["bash", "-c"]
+        when        = destroy
+    } 
+}
